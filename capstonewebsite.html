@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Yari's Travel Diaries</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: url('images/background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      overflow-x: hidden;
+    }
+
+    .background-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.4);
+      z-index: -1;
+    }
+
+    .navbar {
+      background-color: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+      position: relative;
+    }
+
+    .navbar a {
+      color: #b76e79;
+      text-decoration: none;
+      font-weight: bold;
+      margin-left: 15px;
+    }
+
+    .title {
+      font-family: 'Brush Script MT', cursive;
+      font-size: 7rem;
+      color: #8B006A;
+      position: absolute;
+      top: 20px;
+      white-space: nowrap;
+      animation: moveTitle 3s linear infinite;
+    }
+
+    @keyframes moveTitle {
+      0% {
+        left: 100%;
+      }
+      100% {
+        left: -100%;
+      }
+    }
+
+    #index {
+      position: fixed;
+      top: 80px;
+      right: 10px;
+      margin: 20px;
+      z-index: 1000;
+      max-height: 90vh;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    #index img {
+      display: block;
+      width: 40px;
+      height: 40px;
+      margin: 5px 0;
+      border: 2px solid white;
+      border-radius: 6px;
+      object-fit: cover;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    #index img:hover {
+      transform: scale(1.2);
+      border-color: #ee3199;
+    }
+
+    .image-container {
+      position: absolute;
+      max-width: 90vw;
+      max-height: 90vh;
+      display: none;
+      cursor: move;
+      transition: all 0.5s ease;
+      z-index: 999;
+    }
+
+    .image-container img {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+    .image-description {
+      position: absolute;
+      bottom: -25px;
+      left: 0;
+      width: 100%;
+      color: white;
+      text-align: center;
+      font-size: 22px;
+      display: none;
+      text-shadow: 1px 1px 3px black;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 5px;
+    }
+
+    .image-container:hover .image-description {
+      display: block;
+    }
+
+    .video-page {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .video-container {
+      position: relative;
+      max-width: 90vw;
+      margin-top: 20px;
+    }
+
+    .popup {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: white;
+      padding: 20px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      z-index: 2000;
+      display: none;
+    }
+
+    .popup video {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .close-btn {
+      margin-top: 10px;
+      padding: 5px 10px;
+      background-color: #b76e79;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+</head>
+<body>
+  <div class="background-overlay"></div>
+
+  <div class="navbar">
+    <div><strong>Yari's Travel Diaries</strong></div>
+    <div>
+      <a href="#" onclick="showSection('gallery')">Gallery</a>
+      <a href="#" onclick="showSection('videos')">Videos</a>
+    </div>
+  </div>
+
+  <div class="title">Yari's Travel Diaries</div>
+
+  <div id="gallery" class="main-section">
+    <div id="index"></div>
+    <div id="content"></div>
+  </div>
+
+  <div id="videos" class="main-section video-page">
+    <h1>Welcome to My Travel Videos</h1>
+    <p>Explore my adventures through these videos!</p>
+    <div class="video-container">
+      <button onclick="showPopup('jamaica')">Watch Jamaica Video</button>
+      <button onclick="showPopup('puertorico')">Watch Puerto Rico Video</button>
+      <button onclick="showPopup('bahamas')">Watch Bahamas Video</button>
+    </div>
+    <div class="popup" id="popup">
+      <video id="popupVideo" controls></video>
+      <button class="close-btn" onclick="closePopup()">Close</button>
+    </div>
+  </div>
+
+  <script>
+    const descriptions = {
+      1: "I wanted to capture the rushing waters from the top of my hike up Dunns River Falls Water Fall",
+      2: "I wanted to capture a nice refreshing coconut drink that I purchased from the Jamaican vendors outside of the hotel gates",
+      3: "Saw the I love Montego Bay sign pictured outside the airport and wanted to capture it.",
+      4: "My departing catamaran view of the entrance to Dunns River Falls",
+      5: "My plane view of the land of Jamaica before landing",
+      6: "My penne pasta with marinara sauce from one of the restaurants at the all-inclusive hotel",
+      7: "My colorful yummy breakfast of plantains, bread and fruit that delighted my tastebuds",
+      8: "While exploring outside of the hotel gates I was able to capture the essence of a shop",
+      9: "On the way back to the hotel I saw a cow on the side of the road eating grass",
+      10: "While I was having a photoshoot in the water at the beach, a Jamaican man walking in the water selling items on a canoe approached me and joined the shot",
+      11: "My view of the Disney cruise ship from the Island of Nassau, Bahamas",
+      12: "A red old-fashioned vintage car at a car show happening on the island",
+      13: "I spotted a colorful sign advertising the Junkanoo Summer Festival",
+      14: "As I exit Disney's Castaway Cay, I spot a 'See you later mon' sign",
+      15: "As I am in the car riding through the streets of the Bahamas, I spot one of America's most popular fast food restaurants, a McDonald's",
+      16: "On my walk through the Bahamas, I spot another sign that says 'Historic Downtown Nassau' and is covered in stickers",
+      17: "As I enter the island of Nassau, I am greeted by a 'Welcome to Nassau' sign",
+      18: "On the sand of Castaway Cay is a large buoy showing latitude and longitude",
+      19: "My view of the cargo handling train stop at Castaway Cay",
+      20: "At a distance across the island waters, I see a lighthouse",
+      21: "On my tour of Old San Juan, we went to a park where I was able to see Castillo San Felipe del Morro",
+      22: "On a walk around Fuente Raices, I see a star memorial for the 50 years of historic tourism in Puerto Rico",
+      23: "After dinner, I had to get a picture of the brightly lit and colorful arena area at Distrito T-Mobile Convention Boulevard",
+      24: "On the driving tour of San Juan, I wanted to capture as many buildings as possible",
+      25: "I spot a pink building called La Casita, which appears to be a restaurant",
+      26: "The exterior of the Puerto Tourism Company building",
+      27: "I see a cardboard sign with words written in Spanish that says 'What happened to?' and different words on it",
+      28: "As we are driving through the streets, I see a colorful mosaic wall with a quote written by Felisa R Gautier",
+      29: "I had to capture the park service sign of Castillo San Cristobal, San Juan's National Historic Site",
+      30: "At the San Juan airport, I spot a colorful sign representing Puerto Rico with a domino and men playing instruments"
+    };
+
+    function toggleImage(id) {
+      const el = document.getElementById(id);
+      el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+      scatterAndSlant(el);
+    }
+
+    function scatterAndSlant(el) {
+      const maxX = window.innerWidth - el.offsetWidth - 50;
+      const maxY = window.innerHeight - el.offsetHeight - 50;
+      const randomX = Math.random() * maxX;
+      const randomY = Math.random() * maxY;
+      const angle = Math.random() * 30 - 15;
+
+      el.style.left = `${randomX}px`;
+      el.style.top = `${randomY}px`;
+      el.style.transform = `rotate(${angle}deg)`;
+    }
+
+    function showPopup(location) {
+      const videos = {
+        jamaica: "videos/jamaica.mp4",
+        puertorico: "videos/puertorico.mp4",
+        bahamas: "videos/bahamas.mp4"
+      };
+      const videoElement = document.getElementById("popupVideo");
+      videoElement.src = videos[location];
+      document.getElementById("popup").style.display = "block";
+    }
+
+    function closePopup() {
+      const videoElement = document.getElementById("popupVideo");
+      videoElement.pause();
+      videoElement.currentTime = 0;
+      document.getElementById("popup").style.display = "none";
+    }
+
+    function showSection(section) {
+      document.getElementById("gallery").style.display = section === 'gallery' ? 'block' : 'none';
+      document.getElementById("videos").style.display = section === 'videos' ? 'flex' : 'none';
+    }
+
+    $(document).ready(function () {
+      showSection('gallery');
+
+      for (let i = 1; i <= 30; i++) {
+        let thumb, gif, jpg;
+        if (i >= 11 && i <= 20) {
+          thumb = `images/Bahamas_image${(i - 10).toString().padStart(2, '0')}.jpg`;
+          gif = `images/Bahamas_color${(i - 10).toString().padStart(2, '0')}.gif`;
+          jpg = `images/Bahamas_image${(i - 10).toString().padStart(2, '0')}.jpg`;
+        } else if (i >= 21 && i <= 30) {
+          thumb = `images/PuertoRico_image${(i - 20).toString().padStart(2, '0')}.jpg`;
+          gif = `images/PuertoRico_color${(i - 20).toString().padStart(2, '0')}.gif`;
+          jpg = `images/PuertoRico_image${(i - 20).toString().padStart(2, '0')}.jpg`;
+        } else {
+          thumb = `images/Jamaica_image${i.toString().padStart(2, '0')}.jpg`;
+          gif = `images/Jamaica_color${i.toString().padStart(2, '0')}.gif`;
+          jpg = `images/Jamaica_image${i.toString().padStart(2, '0')}.jpg`;
+        }
+
+        $("#index").append(`<img src="${thumb}" onclick="toggleImage('image${i}')" title="Image ${i}">`);
+        $("#content").append(`
+          <div id="image${i}" class="image-container">
+            <img src="${gif}" data-original-src="${gif}" data-hover-src="${jpg}" alt="Image ${i}">
+            <div class="image-description">${descriptions[i]}</div>
+          </div>
+        `);
+      }
+
+      // Enable draggable functionality for all image containers
+      $(".image-container").draggable();
+
+      $(".image-container img").hover(
+        function () {
+          const hoverSrc = $(this).attr("data-hover-src");
+          if (hoverSrc) $(this).attr("src", hoverSrc);
+        },
+        function () {
+          const originalSrc = $(this).attr("data-original-src");
+          $(this).attr("src", originalSrc);
+        }
+      );
+    });
+  </script>
+</body>
+</html>
